@@ -1,4 +1,5 @@
 // (C)opyleft 2013-2016 Frank Denis
+// (C)opyleft 2017 Tom Burdick
 
 //! HyperLogLog implementation for Rust
 #![crate_name = "hyperloglog"]
@@ -1193,6 +1194,39 @@ impl<V> HyperLogLog<V>
             v_phantom: PhantomData,
         }
     }
+
+    pub fn with_seed_and_size(seed: u64, p: u8) -> Self {
+        assert!(p <= 64);
+        let alpha = Self::get_alpha(p);
+        let m = 1usize << p;
+        HyperLogLog {
+            alpha: alpha,
+            p: p,
+            m: m,
+            M: repeat(0u8).take(m).collect(),
+            sip: SipHasher13::new_with_keys(seed, seed),
+            v_phantom: PhantomData,
+        }
+    }
+
+    pub fn with_seed_and_registers(seed: u64, regs: &[u8]) -> Self {
+        let p = regs.len() as u8;
+        let alpha = Self::get_alpha(p);
+        let m = 1usize << p;
+        HyperLogLog {
+            alpha: alpha,
+            p: p,
+            m: m,
+            M: Vec::from(regs),
+            sip: SipHasher13::new_with_keys(seed, seed),
+            v_phantom: PhantomData,
+        }
+    }
+
+    pub fn registers(&self) -> &[u8] {
+        &self.M
+    }
+
 
     pub fn new_from_template(hll: &HyperLogLog<V>) -> Self {
         HyperLogLog {
