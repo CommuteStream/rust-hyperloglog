@@ -1210,9 +1210,12 @@ impl<V> HyperLogLog<V>
     }
 
     pub fn with_seed_and_registers(seed: u64, regs: &[u8]) -> Self {
-        let p = regs.len() as u8;
+        let m = regs.len();
+        let mut p = 0; 
+        while 1usize << p < m {
+            p += 1
+        }
         let alpha = Self::get_alpha(p);
-        let m = 1usize << p;
         HyperLogLog {
             alpha: alpha,
             p: p,
