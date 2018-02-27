@@ -1166,7 +1166,9 @@ static BIAS_DATA: &'static [&'static [f64]] =
         -704.050000000047, -850.486000000034, -757.43200000003,
         -713.308999999892]];
 
-pub struct HyperLogLog<V> {
+
+#[derive(Clone)]
+pub struct HyperLogLog<V: Clone> {
     alpha: f64,
     p: u8,
     m: usize,
@@ -1176,7 +1178,7 @@ pub struct HyperLogLog<V> {
 }
 
 impl<V> HyperLogLog<V>
-    where V: Hash
+    where V: Hash + Clone
 {
     pub fn new(error_rate: f64) -> Self {
         assert!(error_rate > 0.0 && error_rate < 1.0);
