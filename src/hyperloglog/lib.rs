@@ -14,6 +14,7 @@ extern crate siphasher;
 
 use siphasher::sip::SipHasher13;
 use std::cmp::Ordering::{Less, Equal, Greater};
+use std::fmt;
 use std::hash::{Hash, Hasher};
 use std::iter::repeat;
 use std::marker::PhantomData;
@@ -1175,6 +1176,12 @@ pub struct HyperLogLog<V: Clone> {
     M: Vec<u8>,
     sip: SipHasher13,
     v_phantom: PhantomData<V>,
+}
+
+impl<V: Hash + Clone> fmt::Debug for HyperLogLog<V> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "HyperLogLog {{ alpha: {}, p: {}, m: {}, estimate: {} }}", self.alpha, self.p, self.m, self.len())
+    }
 }
 
 impl<V> HyperLogLog<V>
